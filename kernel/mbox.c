@@ -277,15 +277,18 @@ static int do_fb_init(struct fb_struct *fbs) {
         // quest: OS logo
         // save framebuf ptr to fbs->fb
         /* STUDENT_TODO: your code here */
+        fbs->fb=(unsigned char*)(uintptr_t)mbox[28];
         fbs->width=mbox[5];
         // save height 
         /* STUDENT_TODO: your code here */
+        fbs->height=mbox[6];
         fbs->vwidth=mbox[10];
         fbs->vheight=mbox[11];        
         fbs->depth=mbox[20]; 
         fbs->isrgb=mbox[24];     // channel order        
         // save pitch
         /* STUDENT_TODO: your code here */
+        fbs->pitch=mbox[33];
         if(fbs->pitch * fbs->vheight > mbox[29])  // possible that pitch*vheight < actual allocation
             {W("pitch %d x vheight %d!= mbox[29] %u", fbs->pitch, fbs->vheight, mbox[29]);BUG();}
         fbs->size = PGROUNDUP(fbs->pitch * fbs->vheight);  // roundup b/c we'll reserve pages for it
@@ -435,18 +438,27 @@ void fb_showpicture()
             // extract r,g,b from "pixel", then assign that to *ptr
             // if you color does not look right, check "isrgb" in the_fb
             /* STUDENT_TODO: your code here */
+            if (the_fb.isrgb) {
+                *((unsigned int*)ptr) = (pixel[0] << 16) | (pixel[1] << 8) | pixel[2];  // BGR
+            } else {
+                *((unsigned int*)ptr) = (pixel[2] << 16) | (pixel[1] << 8) | pixel[0];  // RGB
+            }
+        ptr += PIXELSIZE;  // Move to the next pixel (each pixel is 4 bytes)
         }
         // advance ptr to the start of the next line of the pixels
         /* STUDENT_TODO: your code here */
+        ptr += the_fb.pitch - img_fb_width*PIXELSIZE;
     }
 
     // show text strings
     // quest: OS logo. 
     // adjust x/y so that the text starts from right below the picture     
     /* STUDENT_TODO: your code here */
+    x = (the_fb.vwidth - 6 * strlen("UVA OS ")) / 2;  // Center the text horizontally
+    y = (the_fb.vheight - img_fb_height) / 2 + img_fb_height + 10;  // Place text below the image with 10px padding
     fb_print(&x, &y, "UVA OS");    
     sprintf(res, " %dx%d", the_fb.width, the_fb.height); // debug info 
-    fb_print(&x, &y, res);
+    // fb_print(&x, &y, res);
 }
 
 /*

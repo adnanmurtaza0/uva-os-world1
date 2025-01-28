@@ -53,8 +53,30 @@
 	state, notably registers x0 - x30, to the stack. subtracts from `sp` the
 	size of total stored registers (#S_FRAME_SIZE) ... */
 	/* STUDENT_TODO: your code here */
-	// ... and then fills the stack space
+	sub	sp, sp, #S_FRAME_SIZE
+	/* ... and then copies the values of x0 - x30 to the stack */
 	/* STUDENT_TODO: your code here */
+    stp x0, x1, [sp, #0]       
+    stp x2, x3, [sp, #16]       
+    stp x4, x5, [sp, #32]
+	stp x6, x7, [sp, #48]
+	stp x8, x9, [sp, #64]
+	stp x10, x11, [sp, #80]
+	stp x12, x13, [sp, #96]
+	stp x14, x15, [sp, #112]
+	stp x16, x17, [sp, #128]
+	stp x18, x19, [sp, #144]
+	stp x20, x21, [sp, #160]
+	stp x22, x23, [sp, #176]
+	stp x24, x25, [sp, #192]
+	stp x26, x27, [sp, #208]
+	stp x28, x29, [sp, #224]
+	str x30, [sp, #240]
+
+
+	// ... and then fills the stack space with the values of x0 - x30
+	/* STUDENT_TODO: your code here */
+	
 	.endm
 
 	/* A mirror of kernel_entry (above), to be called as the last thing of an
@@ -108,7 +130,8 @@ vectors:
 	 	using */
 	ventry	sync_invalid_el1h			// Synchronous EL1h
 	// IRQ EL1h
-ventry	irq_invalid_el1h /* STUDENT_TODO: replace this */
+	/* STUDENT_TODO: replace this */
+	ventry 	el1_irq
 	ventry	fiq_invalid_el1h			// FIQ EL1h
 	ventry	error_invalid_el1h			// Error EL1h
 

@@ -148,8 +148,8 @@ void test_fb_voffset() {
     the_fb.width = N;
     the_fb.height = N;
 
-    the_fb.vwidth = N*2; 
-    the_fb.vheight = N*2; 
+    the_fb.vwidth = N; 
+    the_fb.vheight = 4*N; 
 
     if (fb_init() != 0) BUG();     
 
@@ -161,16 +161,16 @@ void test_fb_voffset() {
         for (x=0;x<N;x++)
             setpixel(the_fb.fb,x,y,pitch,r); 
 
-    for (y=0;y<N;y++)
-        for (x=N;x<2*N;x++)
-            setpixel(the_fb.fb,x,y,pitch,(b|r));             
-
     for (y=N;y<2*N;y++)
+        for (x=0;x<N;x++)
+            setpixel(the_fb.fb,x,y,pitch,(b|r));   
+
+    for (y=2*N;y<3*N;y++)
         for (x=0;x<N;x++)
             setpixel(the_fb.fb,x,y,pitch,g); 
 
-    for (y=N;y<2*N;y++)
-        for (x=N;x<2*N;x++)
+    for (y=3*N;y<4*N;y++)
+        for (x=0;x<N;x++)
             setpixel(the_fb.fb,x,y,pitch,b);             
 
     // // test --- fill all quads the same color
@@ -186,9 +186,9 @@ void test_fb_voffset() {
         ms_delay(1500); 
         fb_set_voffsets(0,N);
         ms_delay(1500); 
-        fb_set_voffsets(N,0);
+        fb_set_voffsets(0, 2*N); // wrong?
         ms_delay(1500); 
-        fb_set_voffsets(N,N);
+        fb_set_voffsets(0,3*N); //wrong?
         ms_delay(1500); 
     }
 }

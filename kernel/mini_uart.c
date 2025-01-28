@@ -51,9 +51,13 @@
 void uart_send (char c) {
 	while(1) {
         // read the status reg to check if the tx fifo is empty
-			/* STUDENT_TODO: your code here */
-	}
-	/* STUDENT_TODO: your code here */
+        if (get32(AUX_MU_LSR_REG) & 0x20) {
+            break;  // break when transmitter is empty
+        }
+    }
+    
+    // Send the character to the UART's I/O register
+    put32(AUX_MU_IO_REG, c);
 }
  
 // busy wait until get a char 
@@ -108,7 +112,13 @@ void uart_irq(void) {
             // read a char, if there's no more, break
             // quest (side): UART rx irq
                 /* STUDENT_TODO: your code here */
-			V("char %d", c); 
+            c = uart_try_recv(); //try get recv a character
+            if (c == -1) {
+                break; // no more char available
+            }
+			V("char %d", c);
+            printf("Received char: %d\n", c);
+            test_ktimer2(c);
 			/* STUDENT_TODO: your code here */
         }
     }
@@ -146,6 +156,8 @@ void uart_init(void) {
     // quest (side): UART rx irq
 	{ // enable rx irq
 		unsigned int ier = get32(AUX_MU_IER_REG); 
+        ier |= AUX_MU_IER_RXIRQ_ENABLE;
+        put32(AUX_MU_IER_REG, ier);
         // flip the bits of ier that enable rx irq, and write back ier to the reg
   		/* STUDENT_TODO: your code here */
 	} // leave tx irq disabled

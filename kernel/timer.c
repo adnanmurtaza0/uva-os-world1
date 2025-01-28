@@ -97,7 +97,15 @@ unsigned long current_counter() {
 	// quest: textual donut. 
 	// read from TIMER_CHI and TIMER_CLO and return a 64bit counter
 	// (assume these two are consistent, since the clock is only 1MHz)
-return 0; /* STUDENT_TODO: replace this */
+	unsigned long hi, lo;
+    
+    // Read the high and low parts of the timer counter
+    hi = get32(TIMER_CHI);  // High part of the counter
+    lo = get32(TIMER_CLO);  // Low part of the counter
+
+    // Combine the two parts to form the 64-bit counter value
+    return ((hi << 32) | lo);
+
 }
 
 ////////////  delay, timekeeping 
@@ -134,13 +142,29 @@ static void sys_timer_tune_delay() {
 // quest: textual donut. implement by calling delay()
 void ms_delay(unsigned ms) {
 	BUG_ON(!cycles_per_ms);
-	/* STUDENT_TODO: your code here */
+	// /* STUDENT_TODO: your code here */
+	// unsigned long start = current_counter();  // Get the starting time
+    // unsigned long target = start + (ms * cycles_per_ms);  // Calculate the target time
+    
+    // // wait until counter reaches target
+    // while (current_counter() < target) {
+    //     // do nothing and j wait
+    // }
+	delay(ms * cycles_per_ms);
 }
 
 // quest: textual donut. implement by calling delay()
 void us_delay(unsigned us) {
 	BUG_ON(!cycles_per_us);
-	/* STUDENT_TODO: your code here */
+	// /* STUDENT_TODO: your code here */
+	// unsigned long start = current_counter();  // Get the starting time
+    // unsigned long target = start + (us * cycles_per_us);  // Calculate the target time
+    
+    // // stay in method until our counter less than target
+    // while (current_counter() < target) {
+    //     // do nothing j wait
+    // }
+	delay(us * cycles_per_us);
 }
 
 // can only be called after va is on, timers are init'd
@@ -221,6 +245,9 @@ static int adjust_sys_timer(void)
 	// the counter. this is ok even if the low 32 bits have to wrap around 
 	// in order to match TIMER_C1 (cf the isr)	
 	/* STUDENT_TODO: your code here */
+	unsigned long next_val = next & 0xFFFFFFFF; // lower 32 bits of the next time
+	put32(TIMER_C1, next_val); // set the next time to the compare register
+
 
 	return 0; 
 }
@@ -328,9 +355,9 @@ void sys_timer_irq(void)
 			// W("called, id %d h %lx", t, (unsigned long)timers[t].handler);	
 			// NB: exec the callback w/ timerlock held
 			// quest (side): virtual timers
-ret = 0; /* STUDENT_TODO: replace this */
+			ret = (*timers[t].handler)(t, timers[t].param, timers[t].context);
 			if (ret==1) { // restart the ktimer in place
-timers[t].elapseat = 0; /* STUDENT_TODO: replace this */
+				timers[t].elapseat = cur + TICKPERMS * timers[t].delayms;
 				adjust_sys_timer(); 
 			} else 
 				timers[t].handler = 0; 

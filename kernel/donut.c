@@ -155,6 +155,7 @@ void sys_timer_irq_simple(void)
     cur = current_counter(); 
     // reset the timer to fire in the future
 	/* STUDENT_TODO: your code here */
+    put32(TIMER_C1, cur + 100 * 1000);	// in us
 }
 
 ///////////////////////////////////////////////////////////////////////////////
