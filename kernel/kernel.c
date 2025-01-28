@@ -51,7 +51,7 @@ void kernel_main() {
 	/* STUDENT_TODO: your code here */
 	// donut_text();
 
-	donut(); // QUEST 11
+	// donut(); // QUEST 11
 
 	while (1)
 		asm volatile("wfi");            // what happen here?
